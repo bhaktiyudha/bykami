@@ -23,11 +23,11 @@ on:
       - "agent/**"
       - "apps/kiosk/**"
       - ".github/workflows/agent.yml"
+  # Unfiltered on purpose, for the same reason as api.yml: this job is a
+  # required check, and a required check that never triggers stays pending
+  # rather than skipped, blocking the merge with nothing to fix. The push
+  # filter above still keeps main builds scoped to what actually changed.
   pull_request:
-    paths:
-      - "agent/**"
-      - "apps/kiosk/**"
-      - ".github/workflows/agent.yml"
   workflow_dispatch:
 
 concurrency:
@@ -39,6 +39,11 @@ permissions:
 
 jobs:
   verify:
+    # Named for the same reason api.yml names its job: the check context is the
+    # job name, and api.yml/deploy.yml also have jobs whose id is `verify`.
+    # Three checks called "verify" cannot be told apart in branch protection,
+    # which is why this one was never added to the required set.
+    name: Verify agent
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
